@@ -21,9 +21,14 @@
     "typescript": "~3.9.7"
   },
   "dependencies": {
+    "@aws-cdk/aws-events": "^1.61.1",
+    "@aws-cdk/aws-events-targets": "^1.61.1",
+    "@aws-cdk/aws-lambda": "^1.61.1",
     "@aws-cdk/aws-sns": "1.61.1",
     "@aws-cdk/aws-sns-subscriptions": "1.61.1",
     "@aws-cdk/aws-sqs": "1.61.1",
+    "@aws-cdk/aws-stepfunctions": "^1.61.1",
+    "@aws-cdk/aws-stepfunctions-tasks": "^1.61.1",
     "@aws-cdk/core": "1.61.1"
   }
 }
