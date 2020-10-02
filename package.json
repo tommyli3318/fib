@@ -21,6 +21,7 @@
     "typescript": "~3.9.7"
   },
   "dependencies": {
+    "@aws-cdk/aws-apigateway": "^1.61.1",
     "@aws-cdk/aws-events": "^1.61.1",
     "@aws-cdk/aws-events-targets": "^1.61.1",
     "@aws-cdk/aws-lambda": "^1.61.1",
