@@ -22,9 +22,11 @@
   },
   "dependencies": {
     "@aws-cdk/aws-apigateway": "^1.61.1",
+    "@aws-cdk/aws-dynamodb": "^1.61.1",
     "@aws-cdk/aws-events": "^1.61.1",
     "@aws-cdk/aws-events-targets": "^1.61.1",
     "@aws-cdk/aws-lambda": "^1.61.1",
+    "@aws-cdk/aws-s3": "^1.61.1",
     "@aws-cdk/aws-sns": "1.61.1",
     "@aws-cdk/aws-sns-subscriptions": "1.61.1",
     "@aws-cdk/aws-sqs": "1.61.1",

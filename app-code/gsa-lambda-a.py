@@ -7,7 +7,7 @@ import boto3
 
 def lambda_handler(event, context):
     s3 = boto3.resource('s3')
-    obj = s3.Object('gsa-fibonacci-s3-bucket', 'names.txt')
+    obj = s3.Object('gsa-fibonacci-s3-bucket ', 'names.txt')
     body = obj.get()['Body'].read().decode("utf-8")
     
     names = body.splitlines()

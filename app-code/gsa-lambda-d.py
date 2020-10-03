@@ -8,7 +8,14 @@ table = dynamodb.Table(table_name)
 
 
 def lambda_handler(event, context):
-    label = event.get('sequence_label')
+        
+    body = json.loads(event['body'])
+    
+    try:
+        label = body['sequence_label']
+    except:
+        label = None
+        
     if label:
         # given a sequence_label
         # respond with the corresponding fib_value
@@ -22,7 +29,7 @@ def lambda_handler(event, context):
         if item:
             return {
                 'statusCode': 200,
-                'body': {'fib_value': item.get('fib_value')}
+                'body': json.dumps({'fib_value': str(item.get('fib_value'))})
             }
             
         else:
@@ -31,14 +38,15 @@ def lambda_handler(event, context):
                 'body': "sequence_label '%s' not found in DB" % label
             }
     
-    
-    
-    value = event.get('fib_value')
-    if value != None:
+    try:
+        value = body['fib_value']
+    except:
+        value = None
         # given a fib_value
         # respond with the corresponding sequence_label(s)
         # Note: there might be multiple labels associated with a value
         
+    if value != None:
         # unexpected type error handling
         if type(value) is not int:
             try:
@@ -66,17 +74,18 @@ def lambda_handler(event, context):
         elif len(labels) == 1:
             return {
                 'statusCode': 200,
-                'body': {'sequence_label': labels[0]}
+                'body': json.dumps({'sequence_label': labels[0]})
             }
         
         else:
             return {
                 'statusCode': 200,
-                'body': {'sequence_labels': labels}
+                'body': json.dumps({'sequence_labels': labels})
             }
 
 
     return {
         'statusCode': 404,
-        'body': "Expected 'sequence_label' or 'fib_value' in request body"
+        'body': "Expected 'sequence_label' or 'fib_value' in request body",
+        'error': json.dumps(body)
     }

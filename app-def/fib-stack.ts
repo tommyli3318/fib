@@ -5,6 +5,8 @@ import * as tasks from "@aws-cdk/aws-stepfunctions-tasks"; // https://docs.aws.a
 import { Rule, Schedule } from "@aws-cdk/aws-events"; // https://docs.aws.amazon.com/cdk/api/latest/docs/aws-events-readme.html
 import { SfnStateMachine } from "@aws-cdk/aws-events-targets"; // https://docs.aws.amazon.com/cdk/api/latest/docs/@aws-cdk_aws-events-targets.SfnStateMachine.html
 import * as apigw from "@aws-cdk/aws-apigateway";
+import * as dynamodb from "@aws-cdk/aws-dynamodb";
+import * as s3 from "@aws-cdk/aws-s3";
 
 export class FibStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
@@ -39,14 +41,14 @@ export class FibStack extends cdk.Stack {
     const taskLambdaA = new tasks.LambdaInvoke(this, "task-invokeA", {
       lambdaFunction: lambdaA,
       comment: "Returns last sequence value from S3",
-      outputPath: "$.outputA",
+      resultPath: "$.outputA",
     });
     const taskLambdaB = new tasks.LambdaInvoke(this, "task-invokeB", {
       lambdaFunction: lambdaB,
       comment:
         "Returns last sequence value with last two inserted fibonacci values",
       inputPath: "$.outputA",
-      outputPath: "$.outputB",
+      resultPath: "$.outputB",
     });
     const taskLambdaC = new tasks.LambdaInvoke(this, "task-invokeC", {
       lambdaFunction: lambdaC,
@@ -63,14 +65,36 @@ export class FibStack extends cdk.Stack {
       stateMachineName: "Run-Lambdas",
     });
 
+    const fibTable = dynamodb.Table.fromTableName(
+      this,
+      "fibTable",
+      "gsa-fibonacci-table"
+    );
+
+    fibTable.grantReadWriteData(lambdaA);
+    fibTable.grantReadWriteData(lambdaB);
+    fibTable.grantReadWriteData(lambdaC);
+    fibTable.grantReadWriteData(lambdaD);
+
+    const namesBucket = s3.Bucket.fromBucketName(
+      this,
+      "names-bucket",
+      "gsa-fibonacci-s3-bucket"
+    );
+    namesBucket.grantRead(lambdaA);
+
     // aws-event rule, tell step function to run once a day
     new Rule(this, "ScheduleRule", {
-      schedule: Schedule.cron({ minute: "0", hour: "12" }),
+      schedule: Schedule.rate(cdk.Duration.days(1)),
       targets: [new SfnStateMachine(stateMachine)],
     });
 
-    new apigw.LambdaRestApi(this, "Endpoint", {
-      handler: lambdaD,
+    const fibApi = new apigw.RestApi(this, "fib-api", {
+      restApiName: "Fibonacci Service",
     });
+
+    const getFibInteractions = new apigw.LambdaIntegration(lambdaD);
+
+    fibApi.root.addMethod("POST", getFibInteractions);
   }
 }
