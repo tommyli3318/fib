@@ -4,7 +4,7 @@ from decimal import Decimal
 from datetime import datetime as dt
 
 # setting up client for dynamodb
-table_name = 'gsa-fibonacci-table'
+table_name = os.getenv('DYNAMODB_TABLE')
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(table_name)
 
